@@ -59,7 +59,8 @@ public class AdminCLI {
             System.out.println("7.  Supprimer une tâche");
             System.out.println("8.  Assigner une tâche");
             System.out.println("9.  Créer un employé");
-            System.out.println("10. Modifier mon profil");
+            System.out.println("10. Voir tous les employés");
+            System.out.println("11. Modifier mon profil");
             System.out.println("0.  Se déconnecter");
             System.out.print("Choix: ");
 
@@ -74,7 +75,8 @@ public class AdminCLI {
                 case "7"  -> supprimerTache();
                 case "8"  -> assignerTache();
                 case "9"  -> creerEmploye();
-                case "10" -> modifierProfil();
+                case "10" -> voirEmployes();
+                case "11" -> modifierProfil();
                 case "0"  -> running = false;
                 default   -> System.out.println("Choix invalide.");
             }
@@ -200,6 +202,17 @@ public class AdminCLI {
 
         utilisateurDAO.create(nom, email, motDePasse, Role.EMPLOYE, departement, poste);
         System.out.println("Employé créé.");
+    }
+
+    private void voirEmployes() throws SQLException {
+        List<Employe> employes = utilisateurDAO.findAllEmployes();
+        if (employes.isEmpty()) {
+            System.out.println("Aucun employé.");
+            return;
+        }
+        for (Employe e : employes) {
+            System.out.println("[" + e.getId() + "] " + e.getNom() + " - " + e.getPoste() + " - " + e.getDepartement());
+        }
     }
 
     private void modifierProfil() throws SQLException {
