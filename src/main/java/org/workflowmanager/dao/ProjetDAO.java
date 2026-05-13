@@ -37,6 +37,21 @@ public class ProjetDAO {
         return null;
     }
 
+    public Projet findById(int idProjet) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+            "SELECT * FROM Projet WHERE id = ?"
+        );
+        stmt.setInt(1, idProjet);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
+            Admin admin = (Admin) utilisateurDAO.findById(rs.getInt("idAdmin"));
+            return mapResultSet(rs, admin);
+        }
+        return null;
+    }
+
     public void delete(int idProjet) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
             "DELETE FROM Projet WHERE id = ?"
