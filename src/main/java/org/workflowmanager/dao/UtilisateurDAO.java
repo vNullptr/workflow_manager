@@ -46,6 +46,19 @@ public class UtilisateurDAO {
         return null;
     }
 
+    public Utilisateur findById(int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+            "SELECT id, nom, email, motDePasse, role, departement, poste FROM Utilisateur WHERE id = ?"
+        );
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return mapResultSet(rs);
+        }
+        return null;
+    }
+
     public Utilisateur findByEmail(String email) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
             "SELECT id, nom, email, motDePasse, role, departement, poste FROM Utilisateur WHERE email = ?"
