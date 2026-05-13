@@ -5,7 +5,7 @@ import org.workflowmanager.dao.ProjetDAO;
 import org.workflowmanager.dao.TacheDAO;
 import org.workflowmanager.dao.UtilisateurDAO;
 import org.workflowmanager.enums.Priorite;
-import org.workflowmanager.enums.StatutTache;
+import org.workflowmanager.enums.Role;
 import org.workflowmanager.model.Admin;
 import org.workflowmanager.model.Employe;
 import org.workflowmanager.model.Projet;
@@ -31,36 +31,54 @@ public class AdminCLI {
         this.scanner = scanner;
     }
 
+    private void clearConsole() {
+        try {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } catch (Exception e) {
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+        }
+    }
+
+    private void pause() {
+        System.out.print("\nAppuyez sur Entrée pour continuer...");
+        scanner.nextLine();
+    }
+
     public void start() throws SQLException {
         boolean running = true;
         while (running) {
-            System.out.println("\n=== Menu Admin ===");
-            System.out.println("1. Créer un projet");
-            System.out.println("2. Supprimer un projet");
-            System.out.println("3. Voir tous les projets");
-            System.out.println("4. Ajouter un membre à un projet");
-            System.out.println("5. Voir les membres d'un projet");
-            System.out.println("6. Ajouter une tâche");
-            System.out.println("7. Supprimer une tâche");
-            System.out.println("8. Assigner une tâche");
-            System.out.println("9. Modifier mon profil");
-            System.out.println("0. Se déconnecter");
+            clearConsole();
+            System.out.println("=== Menu Admin === [" + admin.getNom() + "]");
+            System.out.println("1.  Créer un projet");
+            System.out.println("2.  Supprimer un projet");
+            System.out.println("3.  Voir tous les projets");
+            System.out.println("4.  Ajouter un membre à un projet");
+            System.out.println("5.  Voir les membres d'un projet");
+            System.out.println("6.  Ajouter une tâche");
+            System.out.println("7.  Supprimer une tâche");
+            System.out.println("8.  Assigner une tâche");
+            System.out.println("9.  Créer un employé");
+            System.out.println("10. Modifier mon profil");
+            System.out.println("0.  Se déconnecter");
             System.out.print("Choix: ");
 
             String choix = scanner.nextLine();
             switch (choix) {
-                case "1" -> creerProjet();
-                case "2" -> supprimerProjet();
-                case "3" -> voirProjets();
-                case "4" -> ajouterMembre();
-                case "5" -> voirMembres();
-                case "6" -> ajouterTache();
-                case "7" -> supprimerTache();
-                case "8" -> assignerTache();
-                case "9" -> modifierProfil();
-                case "0" -> running = false;
-                default -> System.out.println("Choix invalide.");
+                case "1"  -> creerProjet();
+                case "2"  -> supprimerProjet();
+                case "3"  -> voirProjets();
+                case "4"  -> ajouterMembre();
+                case "5"  -> voirMembres();
+                case "6"  -> ajouterTache();
+                case "7"  -> supprimerTache();
+                case "8"  -> assignerTache();
+                case "9"  -> creerEmploye();
+                case "10" -> modifierProfil();
+                case "0"  -> running = false;
+                default   -> System.out.println("Choix invalide.");
             }
+            if (running) pause();
         }
     }
 
@@ -166,6 +184,22 @@ public class AdminCLI {
             affectationDAO.create(tache, employe, note);
         }
         System.out.println("Tâche assignée.");
+    }
+
+    private void creerEmploye() throws SQLException {
+        System.out.print("Nom: ");
+        String nom = scanner.nextLine();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("Mot de passe: ");
+        String motDePasse = scanner.nextLine();
+        System.out.print("Département: ");
+        String departement = scanner.nextLine();
+        System.out.print("Poste: ");
+        String poste = scanner.nextLine();
+
+        utilisateurDAO.create(nom, email, motDePasse, Role.EMPLOYE, departement, poste);
+        System.out.println("Employé créé.");
     }
 
     private void modifierProfil() throws SQLException {
