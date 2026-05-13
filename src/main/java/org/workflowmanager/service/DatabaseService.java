@@ -14,12 +14,14 @@ public class DatabaseService{
     private Connection conn;
 
     private DatabaseService(){
+
         this.url = System.getenv("DB_URL");
         this.user = System.getenv("DB_USERNAME");
         this.pass = System.getenv("DB_PASSWORD");
 
         try {
             this.conn = DriverManager.getConnection(this.url, this.user, this.pass);
+            System.out.println("[+] Connexion à la base de données réussie !");
         } catch ( SQLException e){
             throw new RuntimeException("Connexion échouée : " + e.getMessage());
         }
