@@ -92,24 +92,26 @@ public class ProjetDAO {
         return membres;
     }
 
+    private Projet mapResultSet(ResultSet rs, Admin admin) throws SQLException {
+        return new Projet(
+            rs.getInt("id"),
+            rs.getString("nom"),
+            rs.getString("description"),
+            rs.getDate("dateLimite").toLocalDate(),
+            StatutProjet.valueOf(rs.getString("statut")),
+            admin,
+            rs.getTimestamp("dateCreation").toLocalDateTime(),
+            rs.getTimestamp("dateModification").toLocalDateTime()
+        );
+    }
+
     private List<Projet> mapList(ResultSet rs) throws SQLException {
         List<Projet> projets = new ArrayList<>();
         UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
 
         while (rs.next()) {
-            int idAdmin = rs.getInt("idAdmin");
-            Admin admin = (Admin) utilisateurDAO.findById(idAdmin);
-
-            projets.add(new Projet(
-                rs.getInt("id"),
-                rs.getString("nom"),
-                rs.getString("description"),
-                rs.getDate("dateLimite").toLocalDate(),
-                StatutProjet.valueOf(rs.getString("statut")),
-                admin,
-                rs.getTimestamp("dateCreation").toLocalDateTime(),
-                rs.getTimestamp("dateModification").toLocalDateTime()
-            ));
+            Admin admin = (Admin) utilisateurDAO.findById(rs.getInt("idAdmin"));
+            projets.add(mapResultSet(rs, admin));
         }
         return projets;
     }
