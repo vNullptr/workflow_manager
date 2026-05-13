@@ -4,16 +4,47 @@ import org.workflowmanager.enums.Role;
 import org.workflowmanager.model.Admin;
 import org.workflowmanager.model.Employe;
 import org.workflowmanager.model.Utilisateur;
+import org.workflowmanager.service.AuthService;
 import org.workflowmanager.service.DatabaseService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class UtilisateurDAO {
 
     private final Connection conn = DatabaseService.getInstance().getConn();
+
+    public Utilisateur addUtilisateur(String nom, String email, String motDePasse, Role role, String departement, String poste) throws SQLException {
+
+        PreparedStatement stmt = conn.prepareStatement(
+                "INSERT INTO Utilisateur (nom, email, motDePasse, role, departement, poste) VALUES (?,?,?,?,?,?)",
+                Statement.RETURN_GENERATED_KEYS
+        );
+
+        String hashed_pass = AuthService.hacherMotDePasse(motDePasse);
+
+        stmt.setString(1, nom);
+        stmt.setString(2, email);
+        stmt.setString(3, hashed_pass);
+        stmt.setString(4, role.toString());
+        stmt.setString(5, departement);
+        stmt.setString(6, poste);
+        stmt.executeUpdate();
+        ResultSet rs = stmt.getGeneratedKeys();
+
+        if (rs.next()) {
+            int id = rs.getInt(1);
+            if (role == Role.ADMIN) {
+                return new Admin(id, nom, email, hashed_pass, departement);
+            } else {
+                return new Employe(id, nom, email, hashed_pass, departement, poste);
+            }
+        }
+        return null;
+    }
 
     public Utilisateur findByEmail(String email) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
