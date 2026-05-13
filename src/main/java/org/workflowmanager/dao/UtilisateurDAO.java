@@ -12,12 +12,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UtilisateurDAO {
 
     private final Connection conn = DatabaseService.getInstance().getConn();
 
-    public Utilisateur addUtilisateur(String nom, String email, String motDePasse, Role role, String departement, String poste) throws SQLException {
+    public Utilisateur create(String nom, String email, String motDePasse, Role role, String departement, String poste) throws SQLException {
 
         PreparedStatement stmt = conn.prepareStatement(
                 "INSERT INTO Utilisateur (nom, email, motDePasse, role, departement, poste) VALUES (?,?,?,?,?,?)",
@@ -72,7 +74,27 @@ public class UtilisateurDAO {
         return null;
     }
 
-    public void updateProfil(String nom, String email, int id) throws SQLException {
+    public List<Employe> findAllEmployes() throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+            "SELECT id, nom, email, motDePasse, departement, poste FROM Utilisateur WHERE role = 'EMPLOYE'"
+        );
+        ResultSet rs = stmt.executeQuery();
+
+        List<Employe> employes = new ArrayList<>();
+        while (rs.next()) {
+            employes.add(new Employe(
+                rs.getInt("id"),
+                rs.getString("nom"),
+                rs.getString("email"),
+                rs.getString("motDePasse"),
+                rs.getString("departement"),
+                rs.getString("poste")
+            ));
+        }
+        return employes;
+    }
+
+    public void update(String nom, String email, int id) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
             "UPDATE Utilisateur SET nom = ?, email = ? WHERE id = ?"
         );
