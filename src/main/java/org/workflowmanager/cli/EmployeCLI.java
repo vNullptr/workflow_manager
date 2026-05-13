@@ -28,10 +28,25 @@ public class EmployeCLI {
         this.scanner = scanner;
     }
 
+    private void clearConsole() {
+        try {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } catch (Exception e) {
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+        }
+    }
+
+    private void pause() {
+        System.out.print("\nAppuyez sur Entrée pour continuer...");
+        scanner.nextLine();
+    }
+
     public void start() throws SQLException {
         boolean running = true;
         while (running) {
-            System.out.println("\n=== Menu Employé ===");
+            clearConsole();
+            System.out.println("=== Menu Employé === [" + employe.getNom() + "]");
             System.out.println("1. Voir mes tâches");
             System.out.println("2. Mettre à jour le statut d'une tâche");
             System.out.println("3. Voir les détails d'une tâche");
@@ -48,8 +63,9 @@ public class EmployeCLI {
                 case "4" -> voirDetailsProjet();
                 case "5" -> modifierProfil();
                 case "0" -> running = false;
-                default -> System.out.println("Choix invalide.");
+                default  -> System.out.println("Choix invalide.");
             }
+            if (running) pause();
         }
     }
 
